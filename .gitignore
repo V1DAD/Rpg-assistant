@@ -1,0 +1,39 @@
+# ---- dependencies ----
+node_modules/
+
+# ---- PocketBase ----
+# the binary and its release extras (download it again per machine)
+pb/pocketbase
+pb/pocketbase.exe
+pb/LICENSE.md
+pb/CHANGELOG.md
+
+# your database, uploaded files (icons, audio), logs and backups
+pb/pb_data/
+
+# the built frontend (regenerate with `npm run build` in web/)
+pb/pb_public/
+
+# NOT ignored on purpose, so the schema and hooks are versioned:
+#   pb/pb_migrations/
+#   pb/pb_hooks/
+
+# ---- Vite / build output ----
+web/dist/
+*.local
+
+# ---- logs ----
+*.log
+npm-debug.log*
+
+# ---- environment / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- editor and OS ----
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db

@@ -1,0 +1,230 @@
+/* =========================================================
+   Card effects. Colors are derived from --c (set per rarity
+   in card.css). Effects are opt-in classes: fx-gradient,
+   fx-waves, fx-ribbons, fx-contour, fx-diamond.
+   ========================================================= */
+
+/* ---- derived colors and knobs ---- */
+.card-body {
+    --hue-shift: 18;   /* degrees the highlight/shadow drift from the base hue */
+    --lift: 0.12;      /* how much lighter/darker they are */
+
+    --hi: oklch(from var(--c) calc(l + var(--lift)) c calc(h + var(--hue-shift)));
+    --lo: oklch(from var(--c) calc(l - var(--lift)) c calc(h - var(--hue-shift)));
+
+    --sheen: linear-gradient(135deg, var(--hi), var(--c) 50%, var(--lo));
+}
+
+/* fallback for browsers without relative color syntax */
+@supports not (color: oklch(from red l c h)) {
+    .card-body {
+        --hi: color-mix(in srgb, var(--c), white 25%);
+        --lo: color-mix(in srgb, var(--c), black 25%);
+    }
+}
+
+/* ---- effect: gradient only ---- */
+.card-body.fx-gradient {
+    background-image: var(--sheen);
+}
+
+/* ---- shared machinery for all masked effects ---- */
+.card-body:is(   :is(.fx-contour, .fx-diamond)) {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-image: var(--sheen);
+}
+
+.card-body:is(   :is(.fx-contour, .fx-diamond))::before,
+.card-body:is(   :is(.fx-contour, .fx-diamond))::after {
+    content: "";
+    position: absolute;
+    inset: var(--fx-inset, 0);
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--fx-op, 0.6);
+    transform: rotate(var(--fx-rot, 0deg));
+    mask-image: var(--fx-mask);
+    mask-size: var(--fx-size, 100% 100%);
+    mask-repeat: var(--fx-repeat, no-repeat);
+}
+
+/* light layer */
+.card-body:is(   :is(.fx-contour, .fx-diamond))::before {
+    background: var(--hi);
+    mask-position: var(--fx-pos1, 0 0);
+}
+
+/* dark layer */
+.card-body:is(   :is(.fx-contour, .fx-diamond))::after {
+    background: var(--lo);
+    mask-position: var(--fx-pos2, 0 0);
+    transform: rotate(var(--fx-rot, 0deg)) var(--fx-flip2, scaleX(1));
+}
+
+/* faint tinted sheen over the inner boxes */
+.card-body:is(   :is(.fx-contour, .fx-diamond)) .card-field {
+    background-image: linear-gradient(
+            135deg,
+            transparent 0%,
+            color-mix(in srgb, var(--hi) 35%, transparent) 30%,
+            transparent 55%,
+            color-mix(in srgb, var(--lo) 25%, transparent) 80%,
+            transparent 100%
+    );
+}
+
+/* ---- effect: embossed contour lines (liquid metal) ---- */
+.card-body.fx-contour {
+    --sheen: linear-gradient(
+            135deg,
+            var(--hi), var(--c) 22%, var(--lo) 40%, var(--c) 58%, var(--hi) 78%, var(--c)
+    );
+    --fx-op: 0.9;
+    --fx-mask: url(/fx/contour.svg);
+    --fx-size: 256px 256px;
+    --fx-repeat: repeat;
+    --fx-pos1: -1.5px -1.5px;   /* light edge up-left, dark edge down-right = emboss */
+    --fx-pos2: 1.5px 1.5px;
+}
+
+/* ---- effect: diamond facets ---- */
+/* ---- effect: diamond facets (hue shifts only, no darkening) ---- */
+.card-body.fx-diamond {
+    --fx-shift: 80;   /* how far the facet hues drift from the base color (degrees) */
+
+    /* same lightness as the base, only the hue moves */
+    --hi: oklch(from var(--c) calc(l + 0.03) c calc(h + var(--fx-shift)));
+    --lo: oklch(from var(--c) calc(l + 0.03) c calc(h - var(--fx-shift)));
+
+    --sheen: linear-gradient(160deg, var(--hi), var(--c) 50%, var(--lo));
+    --fx-op: 0.7;
+    --fx-mask: url(/fx/diamond.svg);
+    --fx-size: 100% 100%;
+    --fx-flip2: scaleX(-1);     /* the mirrored second layer makes the crossing facets */
+}
+
+/* fallback for browsers without relative color syntax */
+@supports not (color: oklch(from red l c h)) {
+    .card-body.fx-diamond {
+        --hi: color-mix(in srgb, var(--c), white 12%);
+        --lo: color-mix(in srgb, var(--c), white 6%);
+    }
+}
+/* ---- effect: holographic ---- */
+.card-body.fx-holo {
+    --hue-shift: 35;
+    --holo-l: 0.82;
+    --holo-c: 0.16;
+
+    --r1: oklch(from var(--c) var(--holo-l) var(--holo-c) calc(h));
+    --r2: oklch(from var(--c) var(--holo-l) var(--holo-c) calc(h + 50));
+    --r3: oklch(from var(--c) var(--holo-l) var(--holo-c) calc(h + 100));
+    --r4: oklch(from var(--c) var(--holo-l) var(--holo-c) calc(h + 150));
+    --r5: oklch(from var(--c) var(--holo-l) var(--holo-c) calc(h + 200));
+    --r6: oklch(from var(--c) var(--holo-l) var(--holo-c) calc(h + 250));
+    --r7: oklch(from var(--c) var(--holo-l) var(--holo-c) calc(h + 300));
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-image: var(--sheen);
+}
+
+/* rainbow: an oversized layer that is MOVED, never repainted */
+.card-body.fx-holo::before {
+    content: "";
+    position: absolute;
+    inset: -75%;                 /* 250% of the card */
+    z-index: 2;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+            115deg,
+            var(--r1) 0%, var(--r2) 6%, var(--r3) 12%, var(--r4) 18%,
+            var(--r5) 24%, var(--r6) 30%, var(--r7) 36%, var(--r1) 42%
+    );
+    mix-blend-mode: color-dodge;
+    opacity: 0.45;
+    will-change: transform;
+    animation: holo-drift 9s ease-in-out infinite alternate;
+}
+
+/* glare: a 200% layer with a centered spot, moved by translate */
+.card-body.fx-holo::after {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(
+            circle closest-side,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0) 55%
+    );
+    mix-blend-mode: overlay;
+    opacity: 0.7;
+    will-change: transform;
+    transform: translate(
+            calc((var(--px, 0.3) - 0.5) * 50%),
+            calc((var(--py, 0.2) - 0.5) * 50%)
+    );
+}
+
+@keyframes holo-drift {
+    from { transform: translate(-12%, -12%); }
+    to   { transform: translate(12%, 12%); }
+}
+
+/* pointer over the card: the rainbow follows the pointer instead of drifting */
+.card-body.fx-holo.tracking::before {
+    animation: none;
+    transform: translate(
+            calc((0.5 - var(--px, 0.5)) * 24%),
+            calc((0.5 - var(--py, 0.5)) * 24%)
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card-body.fx-holo::before { animation: none; }
+}
+
+/* fallback for browsers without relative color syntax */
+@supports not (color: oklch(from red l c h)) {
+    .card-body.fx-holo {
+        --r1: hsl(0 90% 72%);   --r2: hsl(50 90% 72%);  --r3: hsl(100 90% 72%);
+        --r4: hsl(150 90% 72%); --r5: hsl(200 90% 72%); --r6: hsl(250 90% 72%);
+        --r7: hsl(300 90% 72%);
+    }
+}
+
+/* ---- wiggle: tilt toward the pointer on every card except characters ---- */
+.card-body:not(.character) {
+    will-change: transform;            /* keeps the card as its own cached layer */
+    transition: transform 0.3s ease-out;
+}
+.card-body:not(.character).tracking {
+    transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.02);
+    transition: transform 0.1s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+    .card-body:not(.character).tracking { transform: none; }
+}
+/* ---- waves and ribbons: drawn by FxLayer.svelte (inline SVG, no masks) ---- */
+.card-body:is(.fx-waves, .fx-ribbons) {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-image: var(--sheen);
+}
+
+.card-body:is(.fx-waves, .fx-ribbons) .card-field {
+    background-image: linear-gradient(
+            135deg,
+            transparent 0%,
+            color-mix(in srgb, var(--hi) 35%, transparent) 30%,
+            transparent 55%,
+            color-mix(in srgb, var(--lo) 25%, transparent) 80%,
+            transparent 100%
+    );
+}

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2d4c835b-79c8-4c54-b034-a778a79287e2" name="Changes" comment="primeira versão completa~" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="App" />
+        <option value="Card" />
+        <option value="CharacterCard" />
+        <option value="ItemForm" />
+        <option value="MusicBar" />
+        <option value="Login" />
+        <option value="DMView" />
+        <option value="PlayerView" />
+        <option value="FxLayer" />
+        <option value="MusicManager" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "V1DAD"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/V1DAD/Rpg-assistant.git",
+    "accountId": "257a09ea-1d44-482e-8946-22e7153eb4a8"
+  }
+}]]></component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0000000184730842" />
+      <entry key="MS500" value="1.0284042392351493" />
+      <entry key="S2" value="1.518976501930881" />
+      <entry key="S5" value="2.6302489569493157" />
+      <entry key="S10" value="3.7607490113535804" />
+      <entry key="S30" value="5.074718967776698" />
+      <entry key="S60" value="5.510218741599561" />
+      <entry key="M2" value="5.748913852453244" />
+      <entry key="M5" value="6.049406860998282" />
+      <entry key="M10" value="7.125145328040434" />
+      <entry key="M15" value="8.900375710697581" />
+      <entry key="M30" value="18.13067186700804" />
+      <entry key="H1" value="44.49025725495695" />
+      <entry key="H2" value="90.1922487036636" />
+      <entry key="H4" value="139.3436187004218" />
+      <entry key="D1" value="209.20388212709375" />
+      <entry key="W1" value="225.19317845865947" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="2.7331304698619347E-148" />
+      <entry key="S10" value="2.288031749844752E-74" />
+      <entry key="S30" value="4.484031505759957E-25" />
+      <entry key="S60" value="9.464011452346163E-13" />
+      <entry key="M2" value="1.3755742377149602E-6" />
+      <entry key="M5" value="0.0068551719723243375" />
+      <entry key="M10" value="0.11840540081107298" />
+      <entry key="M15" value="0.3320060711587992" />
+      <entry key="M30" value="1.6234134394715407" />
+      <entry key="H1" value="5.938965567978682" />
+      <entry key="H2" value="12.768414958206666" />
+      <entry key="H4" value="19.127978054533884" />
+      <entry key="D1" value="27.03576520340218" />
+      <entry key="W1" value="28.710358861069732" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.9460576640814788" />
+      <entry key="MS500" value="1.0170229446466676" />
+      <entry key="S2" value="1.5139412867999293" />
+      <entry key="S5" value="2.6244375302971084" />
+      <entry key="S10" value="3.7555709824878054" />
+      <entry key="S30" value="5.072063792618578" />
+      <entry key="S60" value="5.508733739331284" />
+      <entry key="M2" value="5.748129121243043" />
+      <entry key="M5" value="6.0555026674481915" />
+      <entry key="M10" value="7.239916177165792" />
+      <entry key="M15" value="9.226211075718652" />
+      <entry key="M30" value="19.74396234782505" />
+      <entry key="H1" value="50.416295104865355" />
+      <entry key="H2" value="102.94857500966901" />
+      <entry key="H4" value="158.46295525073936" />
+      <entry key="D1" value="236.2376619992044" />
+      <entry key="W1" value="253.90323702179822" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3M0gL4ZH9i89I5IlEueBpVAz281" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "master",
+    "javascript.preferred.runtime.type.id": "node",
+    "last_opened_file_path": "/home/dvd/Documents/rpg_manager",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "advanced.settings",
+    "ts.external.directory.path": "/home/dvd/.local/share/JetBrains/Toolbox/apps/webstorm/plugins/javascript-plugin/jsLanguageServicesImpl/external"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/web/src" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-56aff7b04f6f-JavaScript-WS-263.7307.202" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2d4c835b-79c8-4c54-b034-a778a79287e2" name="Changes" comment="" />
+      <created>1794492839205</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1794492839205</updated>
+      <workItem from="1794492840208" duration="1435000" />
+      <workItem from="1794494304826" duration="26000" />
+      <workItem from="1794494346102" duration="4588000" />
+      <workItem from="1794499823170" duration="2443000" />
+      <workItem from="1794515602431" duration="898000" />
+      <workItem from="1794519912310" duration="3172000" />
+      <workItem from="1794523465680" duration="2850000" />
+      <workItem from="1794527056884" duration="10988000" />
+      <workItem from="1794538343534" duration="349000" />
+      <workItem from="1794538805473" duration="527000" />
+      <workItem from="1794539569976" duration="1384000" />
+    </task>
+    <task id="LOCAL-00001" summary="primeira versão completa">
+      <option name="closed" value="true" />
+      <created>1794539909001</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1794539909001</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="MARK_IGNORED_AS_EXCLUDED" value="true" />
+    <MESSAGE value="primeira versão completa" />
+    <option name="LAST_COMMIT_MESSAGE" value="primeira versão completa" />
+  </component>
+</project>
