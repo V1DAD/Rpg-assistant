@@ -4,7 +4,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'  // omit/replace for other
 export default defineConfig({
   plugins: [svelte()],
   build: {
-    outDir: '../pb/pb_public',
+    outDir: '../server/dist',
     emptyOutDir: true,
   },
   server: {

@@ -37,3 +37,7 @@ npm-debug.log*
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+
+desktop/node_modules/
+desktop/dist/
+desktop/server/
