@@ -2,7 +2,10 @@ module rpg-assistant
 
 go 1.27.4
 
-require github.com/pocketbase/pocketbase v0.40.6
+require (
+	github.com/pocketbase/pocketbase v0.40.6
+	golang.org/x/term v0.48.0
+)
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
@@ -30,7 +33,7 @@ require (
 	golang.org/x/net v0.61.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
-	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.77.1 // indirect
