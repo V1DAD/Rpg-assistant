@@ -6,10 +6,12 @@ const os = require('os')
 
 const PORT = 8090
 const URL = `http://127.0.0.1:${PORT}`
+
 let server = null, win = null, tray = null
 let quitting = false
-let installerUrl = null      // the "create admin account" link, when PocketBase prints one
+let installerUrl = null       // the "create admin account" link, when PocketBase prints one
 let installerShown = false
+let tail = ''                 // the last bit of server output, used in error messages
 
 // only one copy of the app at a time
 if (!app.requestSingleInstanceLock()) app.quit()
@@ -35,7 +37,8 @@ function lineReader(fn) {
 }
 
 function onLine(line) {
-  const m = line.match(/https?:\/\/\S*pbinstal\S*/)
+  // a dashboard link that carries a token (#... or ?...)
+  const m = line.match(/https?:\/\/\S*\/_\/\S*[#?]\S*/)
   if (m) setInstallerUrl(m[0])
 }
 
@@ -44,10 +47,11 @@ function setInstallerUrl(url) {
   refreshMenus()
   if (win && !installerShown) {    // window already open: take the user to the form
     installerShown = true
-    go(installerUrl)
+    openInstaller()
   }
 }
 
+/* ---------- the server process ---------- */
 function startServer() {
   // the database lives in the user's app-data folder, not inside the installed app
   const dataDir = path.join(app.getPath('userData'), 'pb_data')
@@ -59,25 +63,46 @@ function startServer() {
       env: { ...process.env, RPG_NO_BROWSER: '1' },   // never open the system browser
     }
   )
+
+  const keep = (chunk) => {
+    tail = (tail + chunk.toString()).slice(-3000)
+    process.stdout.write(chunk)                        // also show it in the terminal
+  }
+  server.stdout.on('data', keep)
+  server.stderr.on('data', keep)
   server.stdout.on('data', lineReader(onLine))
   server.stderr.on('data', lineReader(onLine))
+
+  server.on('error', (err) => {                        // e.g. the executable is missing
+    tail += '\n' + err.message
+    server = null
+  })
+
   server.on('exit', (code) => {
     server = null
-    if (!quitting) console.error('Server stopped unexpectedly, exit code', code)
+    if (!quitting && win) {                            // it was running and then stopped
+      dialog.showErrorBox('RPG Assistant', `The server stopped (exit code ${code}).\n\n${tail}`)
+      quitting = true
+      app.quit()
+    }
   })
 }
 
 function waitForServer(retries = 60) {
   return new Promise((resolve, reject) => {
     const retry = (n) =>
-      n <= 0 ? reject(new Error('The server did not start')) : setTimeout(() => attempt(n - 1), 500)
-    const attempt = (n) =>
+      n <= 0
+        ? reject(new Error('The server did not start in time.\n\n' + tail))
+        : setTimeout(() => attempt(n - 1), 500)
+    const attempt = (n) => {
+      if (!server) return reject(new Error('The server stopped during startup.\n\n' + tail))
       http
         .get(`${URL}/api/health`, (res) => {
           res.resume()
           res.statusCode === 200 ? resolve() : retry(n)
         })
         .on('error', () => retry(n))
+    }
     attempt(retries)
   })
 }
@@ -97,6 +122,19 @@ function go(url) {
   win.loadURL(url)
 }
 
+async function openInstaller() {
+  if (!win || !installerUrl) return
+  // a login left over from an earlier database can send the page to the login screen
+  await win.webContents.session.clearStorageData({
+    origin: URL,
+    storages: ['localstorage', 'cookies'],
+  })
+  win.show()
+  win.focus()
+  await win.loadURL('about:blank')   // force a full reload, even if the dashboard is open
+  win.loadURL(installerUrl)
+}
+
 function createWindow() {
   win = new BrowserWindow({
     width: 1280,
@@ -106,9 +144,12 @@ function createWindow() {
   })
 
   // first run: go straight to the "create admin account" page if its link is already known
-  let first = URL
-  if (installerUrl && !installerShown) { first = installerUrl; installerShown = true }
-  win.loadURL(first)
+  if (installerUrl && !installerShown) {
+    installerShown = true
+    openInstaller()
+  } else {
+    win.loadURL(URL)
+  }
 
   // links to our own server stay inside the window, everything else opens in the browser
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -117,7 +158,7 @@ function createWindow() {
     return { action: 'deny' }
   })
   win.webContents.on('will-navigate', (e, url) => {
-    if (!url.startsWith(URL)) {
+    if (!url.startsWith(URL) && url !== 'about:blank') {
       e.preventDefault()
       shell.openExternal(url)
     }
@@ -140,7 +181,7 @@ function appMenu() {
         { label: "Players' app", accelerator: 'CmdOrCtrl+1', click: () => go(URL) },
         { label: 'Admin panel (PocketBase)', accelerator: 'CmdOrCtrl+2', click: () => go(`${URL}/_/`) },
         ...(installerUrl
-          ? [{ label: 'Create admin account (first run)', accelerator: 'CmdOrCtrl+3', click: () => go(installerUrl) }]
+          ? [{ label: 'Create admin account (first run)', accelerator: 'CmdOrCtrl+3', click: () => openInstaller() }]
           : []),
         { type: 'separator' },
         { label: 'Back', accelerator: 'Alt+Left', click: () => nav()?.canGoBack() && nav().goBack() },
@@ -159,7 +200,7 @@ function trayMenu() {
     { label: 'Admin panel (PocketBase)', click: () => go(`${URL}/_/`) },
     ...(installerUrl
       ? [
-          { label: 'Create admin account (first run)', click: () => go(installerUrl) },
+          { label: 'Create admin account (first run)', click: () => openInstaller() },
           { label: 'Copy admin account link', click: () => clipboard.writeText(installerUrl) },
         ]
       : []),

@@ -62,23 +62,20 @@ func main() {
 		se.Router.GET("/{path...}", apis.Static(site, false))
 
 		// first run (no admin account yet): show the "create admin account" link
+
 		se.InstallerFunc = func(app core.App, su *core.Record, baseURL string) error {
 			installerShown.Store(true)
 			if !noBrowser {
-				// PocketBase's own behavior: prints the link and opens the browser
+				// normal use: PocketBase prints the link and opens the browser
 				return apis.DefaultInstallerFunc(app, su, baseURL)
 			}
-			// desktop shell: just print the link, the shell reads it and shows it in its window
-			token, err := su.NewStaticAuthToken(30 * time.Minute)
-			if err != nil {
-				return err
-			}
-			base := strings.NewReplacer("0.0.0.0", "127.0.0.1", "[::]", "127.0.0.1").Replace(baseURL)
-			fmt.Println("\n  FIRST RUN: create your admin account here (valid for 30 minutes):")
-			fmt.Println("  " + base + "/_/#/pbinstal/" + token + "\n")
-			return nil
+			// desktop shell: PocketBase still prints its own link, but with an empty PATH
+			// it can't find the program that opens a browser, so nothing opens
+			oldPath := os.Getenv("PATH")
+			os.Setenv("PATH", "")
+			defer os.Setenv("PATH", oldPath)
+			return apis.DefaultInstallerFunc(app, su, baseURL)
 		}
-
 		printAddresses(se.Server.Addr)
 
 		if launchedByDoubleClick && !noBrowser {
