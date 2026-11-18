@@ -2,42 +2,30 @@
   "name": "rpg-assistant-desktop",
   "productName": "RPG Assistant",
   "version": "1.0.0",
+  "description": "RPG Assistant desktop app",
+  "author": "RPG Assistant",
+  "private": true,
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist:linux": "electron-builder --linux",
+    "dist:win": "electron-builder --win --x64",
+    "dist": "electron-builder --linux --win --x64"
   },
   "build": {
     "appId": "com.example.rpgassistant",
-    "files": [
-      "main.js",
-      "icon.png"
-    ],
-    "extraResources": [
-      {
-        "from": "server",
-        "to": "server"
-      }
-    ],
+    "productName": "RPG Assistant",
+    "icon": "icon.png",
+    "artifactName": "RPG-Assistant-${version}-${os}.${ext}",
+    "files": ["main.js", "icon.png"],
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "category": "Game",
+      "extraResources": [{ "from": "server-linux", "to": "server" }]
     },
     "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
+      "target": [{ "target": "portable", "arch": ["x64"] }],
+      "extraResources": [{ "from": "server-win", "to": "server" }]
     }
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "electron": "^41.7.1",
-    "electron-builder": "^26.18.0"
-  },
-  "dependencies": {
-    "nvm": "^0.0.4"
   }
 }

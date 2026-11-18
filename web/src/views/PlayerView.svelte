@@ -2,6 +2,7 @@
     import { liveList } from '../lib/liveList.js'
     import Card from '../components/Card.svelte'
     import CharacterCard from '../components/CharacterCard.svelte'
+    import Notes from '../components/Notes.svelte'
 
     export let user
 
@@ -15,20 +16,25 @@
 <nav class="tabs pixelify-sans">
     <button class:active={tab === 'sheet'} on:click={() => (tab = 'sheet')}>My sheet</button>
     <button class:active={tab === 'items'} on:click={() => (tab = 'items')}>My items</button>
+    <button class:active={tab === 'notes'} on:click={() => (tab = 'notes')}>Notes</button>
 </nav>
 
-<div class="grid">
-    {#if tab === 'sheet'}
-        {#each $characters as c (c.id)}
-            <CharacterCard record={c} canAdjust={true} />
+{#if tab === 'notes'}
+    <Notes {user} />
+{:else}
+    <div class="grid">
+        {#if tab === 'sheet'}
+            {#each $characters as c (c.id)}
+                <CharacterCard record={c} canAdjust={true} />
+            {:else}
+                <p class="empty">No character is assigned to your account yet.</p>
+            {/each}
         {:else}
-            <p class="empty">No character is assigned to your account yet.</p>
-        {/each}
-    {:else}
-        {#each $items as item (item.id)}
-            <Card record={item} />
-        {:else}
-            <p class="empty">You have no items yet.</p>
-        {/each}
-    {/if}
-</div>
+            {#each $items as item (item.id)}
+                <Card record={item} />
+            {:else}
+                <p class="empty">You have no items yet.</p>
+            {/each}
+        {/if}
+    </div>
+{/if}

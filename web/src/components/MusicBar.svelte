@@ -1,7 +1,8 @@
 <script>
     import { pb } from '../lib/pb.js'
     import {
-        playback, tracks, localPaused, blocked, time, duration, volume, dm, enableSound, musicError,
+        playback, tracks, localPaused, blocked, time, duration, volume, dm, enableSound,
+        musicError, one, sfxVolume, sfxMuted,
     } from '../lib/music.js'
 
     export let isDM = false
@@ -9,7 +10,7 @@
     let seeking = false
     let seekVal = 0
 
-    $: track = $playback && $tracks.find((t) => t.id === $playback.track)
+    $: track = $playback && $tracks.find((t) => t.id === one($playback.track))
     $: iconUrl = track?.icon ? pb.files.getURL(track, track.icon) : null
     $: playing = !!$playback?.playing
 
@@ -62,6 +63,14 @@
             <input type="range" min="0" max="1" step="0.01" bind:value={$volume} />
         </label>
 
+        <label class="mb-vol">
+            FX
+            <input type="range" min="0" max="1" step="0.01" bind:value={$sfxVolume} disabled={$sfxMuted} />
+        </label>
+        <button on:click={() => ($sfxMuted = !$sfxMuted)} title="Mute or unmute sound effects on this device">
+            {$sfxMuted ? 'FX off' : 'FX on'}
+        </button>
+
         {#if $blocked && playing && !$localPaused}
             <button on:click={enableSound}>Enable sound</button>
         {/if}
@@ -98,10 +107,10 @@
     }
     .mb-main { flex: 1; min-width: 0; }
     .mb-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mb-err { color: #a00000; font-size: 12px; }
     .mb-seek { display: flex; align-items: center; gap: 8px; font-size: 13px; }
     .mb-seek input, .mb-seek progress { flex: 1; min-width: 0; }
-    .mb-controls { display: flex; align-items: center; gap: 8px; flex: none; }
+    .mb-controls { display: flex; align-items: center; gap: 8px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
     .mb-vol { flex-direction: row; align-items: center; gap: 6px; }
-    .mb-vol input { width: 90px; }
-    .mb-err { color: #a00000; font-size: 12px; }
+    .mb-vol input { width: 80px; }
 </style>

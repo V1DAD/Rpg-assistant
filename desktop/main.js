@@ -1,11 +1,16 @@
-const { app, BrowserWindow, Tray, Menu, shell, clipboard, dialog } = require('electron')
+const { app, BrowserWindow, Tray, Menu, shell, clipboard, dialog, nativeImage } = require('electron')
 const { spawn } = require('child_process')
 const path = require('path')
 const http = require('http')
 const os = require('os')
 
+const APP_NAME = 'RPG Assistant'
 const PORT = 8090
 const URL = `http://127.0.0.1:${PORT}`
+const ICON = path.join(__dirname, 'icon.png')
+
+app.setName(APP_NAME)
+if (process.platform === 'win32') app.setAppUserModelId('com.example.rpgassistant')
 
 let server = null, win = null, tray = null
 let quitting = false
@@ -81,7 +86,7 @@ function startServer() {
   server.on('exit', (code) => {
     server = null
     if (!quitting && win) {                            // it was running and then stopped
-      dialog.showErrorBox('RPG Assistant', `The server stopped (exit code ${code}).\n\n${tail}`)
+      dialog.showErrorBox(APP_NAME, `The server stopped (exit code ${code}).\n\n${tail}`)
       quitting = true
       app.quit()
     }
@@ -139,9 +144,14 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 800,
+    title: APP_NAME,
+    icon: nativeImage.createFromPath(ICON),
     autoHideMenuBar: false,        // keep the menu visible: it is how you reach the admin panel
     webPreferences: { contextIsolation: true },
   })
+
+  // always show the app name in the title bar, whatever page is loaded
+  win.on('page-title-updated', (e) => e.preventDefault())
 
   // first run: go straight to the "create admin account" page if its link is already known
   if (installerUrl && !installerShown) {
@@ -176,7 +186,7 @@ function appMenu() {
   const nav = () => win?.webContents.navigationHistory ?? win?.webContents
   return Menu.buildFromTemplate([
     {
-      label: 'RPG Assistant',
+      label: APP_NAME,
       submenu: [
         { label: "Players' app", accelerator: 'CmdOrCtrl+1', click: () => go(URL) },
         { label: 'Admin panel (PocketBase)', accelerator: 'CmdOrCtrl+2', click: () => go(`${URL}/_/`) },
@@ -218,8 +228,8 @@ function refreshMenus() {
 }
 
 function createTray() {
-  tray = new Tray(path.join(__dirname, 'icon.png'))
-  tray.setToolTip('RPG Assistant')
+  tray = new Tray(nativeImage.createFromPath(ICON).resize({ width: 24, height: 24 }))
+  tray.setToolTip(APP_NAME)
   tray.on('click', () => win?.show())
   refreshMenus()
 }
@@ -230,7 +240,7 @@ app.whenReady().then(async () => {
   try {
     await waitForServer()
   } catch (err) {
-    dialog.showErrorBox('RPG Assistant', String(err.message))
+    dialog.showErrorBox(APP_NAME, String(err.message))
     quitting = true
     app.quit()
     return

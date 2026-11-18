@@ -1,6 +1,6 @@
 <script>
     import { pb } from '../lib/pb.js'
-    import { tracks, playlists, playback, dm } from '../lib/music.js'
+    import { tracks, playlists, playback, dm, one } from '../lib/music.js'
     import { readAudioMeta } from '../lib/audioMeta.js'
 
     /* ---------- single track upload ---------- */
@@ -10,17 +10,18 @@
     let busy = false, error = ''
 
     /* ---------- manual playlist form ---------- */
-    let plName = '', selected = []
+    let plName = '', selected = [], plSfx = false
 
     /* ---------- folder import ---------- */
     const AUDIO_EXT = /\.(mp3|ogg|oga|opus|flac|wav|m4a|aac|webm)$/i
     let folderPlName = ''
+    let folderSfx = false
     let folderBusy = false
     let folderMsg = ''
     let folderErrors = []
     let folderDone = 0
     let folderTotal = 0
-    let pendingIds = [], pendingName = ''
+    let pendingIds = [], pendingName = '', pendingSfx = false
 
     function pbError(err) {
         const d = err?.response?.data
@@ -30,7 +31,7 @@
 
     async function createPending() {
         try {
-            await pb.collection('playlists').create({ name: pendingName, tracks: pendingIds })
+            await pb.collection('playlists').create({ name: pendingName, tracks: pendingIds, sfx: pendingSfx })
             folderMsg = `Created "${pendingName}" with ${pendingIds.length} track(s)` +
                 (folderErrors.length ? `, ${folderErrors.length} failed` : '')
             pendingIds = []
@@ -87,6 +88,7 @@
             if (ids.length) {
                 pendingIds = ids
                 pendingName = listName
+                pendingSfx = folderSfx
                 await createPending()
             } else {
                 folderMsg = 'Nothing could be uploaded'
@@ -161,10 +163,18 @@
     async function addPlaylist() {
         if (!plName || !selected.length) return
         try {
-            await pb.collection('playlists').create({ name: plName, tracks: selected })
-            plName = ''; selected = []
+            await pb.collection('playlists').create({ name: plName, tracks: selected, sfx: plSfx })
+            plName = ''; selected = []; plSfx = false
         } catch (e) {
             alert('Could not create the playlist: ' + pbError(e))
+        }
+    }
+
+    async function setSfx(p, on) {
+        try {
+            await pb.collection('playlists').update(p.id, { sfx: on })
+        } catch (e) {
+            alert('Could not change the playlist: ' + pbError(e))
         }
     }
 
@@ -181,6 +191,10 @@
             <strong>Import a folder as a playlist</strong>
             <label>Playlist name (optional, defaults to the folder name)
                 <input bind:value={folderPlName} disabled={folderBusy} />
+            </label>
+            <label class="check">
+                <input type="checkbox" bind:checked={folderSfx} disabled={folderBusy} />
+                Sound effects (shown on the Sound board)
             </label>
             <label>Folder
                 <input type="file" webkitdirectory multiple disabled={folderBusy} on:change={importFolder} />
@@ -211,16 +225,21 @@
         </form>
 
         {#each groups as g (g.playlist.id)}
-            <details class="group" open={$playback?.playlist === g.playlist.id}>
+            <details class="group" open={one($playback?.playlist) === g.playlist.id}>
                 <summary class="pixelify-sans">
                     <span class="grow">{g.playlist.name}</span>
+                    {#if g.playlist.sfx}<span class="tag">FX</span>{/if}
                     <span class="count">{g.tracks.length}</span>
                 </summary>
                 {#each g.tracks as t (t.id)}
-                    <div class="row" class:now={$playback?.track === t.id && $playback?.playing}>
+                    <div class="row" class:now={one($playback?.track) === t.id && $playback?.playing}>
                         <div class="thumb">{#if iconUrl(t)}<img src={iconUrl(t)} alt="" />{/if}</div>
                         <span class="grow">{t.name}</span>
-                        <button on:click={() => dm.play(t.id, g.playlist.id)}>Play</button>
+                        {#if g.playlist.sfx}
+                            <button on:click={() => dm.sfx(t.id)}>FX</button>
+                        {:else}
+                            <button on:click={() => dm.play(t.id, g.playlist.id)}>Play</button>
+                        {/if}
                         <button on:click={() => removeTrack(t)}>Delete</button>
                     </div>
                 {/each}
@@ -232,7 +251,7 @@
         {/if}
 
         {#each loose as t (t.id)}
-            <div class="row" class:now={$playback?.track === t.id && $playback?.playing}>
+            <div class="row" class:now={one($playback?.track) === t.id && $playback?.playing}>
                 <div class="thumb">{#if iconUrl(t)}<img src={iconUrl(t)} alt="" />{/if}</div>
                 <span class="grow">{t.name}</span>
                 <button on:click={() => dm.play(t.id)}>Play</button>
@@ -250,6 +269,10 @@
 
         <form class="panel" on:submit|preventDefault={addPlaylist}>
             <label>Name <input bind:value={plName} required /></label>
+            <label class="check">
+                <input type="checkbox" bind:checked={plSfx} />
+                Sound effects (shown on the Sound board)
+            </label>
             <div class="picker">
                 {#each $tracks as t (t.id)}
                     <label class="check">
@@ -261,9 +284,15 @@
         </form>
 
         {#each $playlists as p (p.id)}
-            <div class="row" class:now={$playback?.playlist === p.id && $playback?.playing}>
+            <div class="row" class:now={one($playback?.playlist) === p.id && $playback?.playing}>
                 <span class="grow">{p.name} ({p.tracks.length})</span>
-                <button disabled={!p.tracks.length} on:click={() => dm.play(p.tracks[0], p.id)}>Play</button>
+                <label class="check" title="Show this playlist on the Sound board">
+                    <input type="checkbox" checked={!!p.sfx} on:change={(e) => setSfx(p, e.target.checked)} /> FX
+                </label>
+                <button
+                        disabled={!p.tracks.length || p.sfx}
+                        title={p.sfx ? 'Sound effects play from the Sound board tab' : ''}
+                        on:click={() => dm.play(p.tracks[0], p.id)}>Play</button>
                 <button on:click={() => removePlaylist(p)}>Delete</button>
             </div>
         {:else}
@@ -305,5 +334,6 @@
     .group[open] > summary::before { content: '▾'; }
     .group .row { border-width: 0 0 2px 0; }
     .count { opacity: 0.7; }
+    .tag { font-size: 11px; padding: 0 4px; border: 2px outset #999; background: #d9d9a0; }
     .subhead { margin-top: 6px; font-size: 13px; opacity: 0.7; }
 </style>
